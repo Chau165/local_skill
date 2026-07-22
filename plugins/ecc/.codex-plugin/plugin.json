@@ -1,0 +1,28 @@
+{
+  "name": "ecc",
+  "version": "2.0.0-local",
+  "description": "Selected ECC workflows for Codex: TDD, review, verification, security, and context management.",
+  "author": {
+    "name": "Affaan Mustafa",
+    "url": "https://github.com/affaan-m/ECC"
+  },
+  "repository": "https://github.com/affaan-m/ECC",
+  "license": "MIT",
+  "keywords": ["codex", "skills", "tdd", "review", "verification"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ECC",
+    "shortDescription": "Curated ECC skills for Codex.",
+    "longDescription": "A minimal, self-contained local Codex plugin built from ECC's Codex-facing skills and workflows.",
+    "developerName": "Affaan Mustafa",
+    "category": "Coding",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://github.com/affaan-m/ECC",
+    "brandColor": "#E07856",
+    "defaultPrompt": [
+      "Use the tdd-workflow skill when implementation work should start with tests.",
+      "Use the verification-loop skill before shipping code changes.",
+      "Use the strategic-compact skill when context pressure becomes a risk."
+    ]
+  }
+}

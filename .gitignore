@@ -1,0 +1,14 @@
+# Never commit Codex runtime state or credentials.
+.codex-runtime/
+**/.env
+**/.env.*
+**/auth.json
+**/*token*
+**/*secret*
+**/*.sqlite
+**/*.sqlite-*
+**/*.log
+**/*.jsonl
+**/__pycache__/
+**/*.pyc
+
