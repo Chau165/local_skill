@@ -1,5 +1,7 @@
 # Codex Configuration Backup
 
+This is the `Chau165/local_skill` backup repository for the local Codex `AGENTS.md`, skills, prompts, agents, and ECC plugin workflows.
+
 This repository stores the user-maintained Codex configuration surface from `C:\Users\Surface\.codex`.
 
 ## Included
