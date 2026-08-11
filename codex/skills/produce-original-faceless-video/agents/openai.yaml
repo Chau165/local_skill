@@ -1,0 +1,4 @@
+interface:
+  display_name: "Produce Original Faceless Video"
+  short_description: "Build image-based cartoon faceless videos"
+  default_prompt: "Use $produce-original-faceless-video to create an original asset-first cartoon video with generated image layers, HyperFrames animation, approvals, provenance, and motion QA."

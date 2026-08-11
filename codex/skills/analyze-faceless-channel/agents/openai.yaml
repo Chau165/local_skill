@@ -1,0 +1,4 @@
+interface:
+  display_name: "Analyze Faceless Channel"
+  short_description: "Analyze faceless visual and motion style"
+  default_prompt: "Use $analyze-faceless-channel to analyze public references into an originality-safe, evidence-linked visual, asset, camera, and motion profile."

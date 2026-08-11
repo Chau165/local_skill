@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit Faceless Video"
+  short_description: "Audit cartoon assets, originality, and motion"
+  default_prompt: "Use $audit-faceless-video after a candidate export exists to audit originality, asset provenance, requested image-based art direction, independent motion, and release readiness."
