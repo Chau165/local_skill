@@ -12,3 +12,6 @@
 **/__pycache__/
 **/*.pyc
 
+# This is skill source code, not a credential/token file.
+!codex/skills/faceless-explainer/scripts/lib/tokens.mjs
+
