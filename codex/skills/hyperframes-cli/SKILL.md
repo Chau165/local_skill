@@ -18,14 +18,15 @@ For this installation's local custom-skill mode, keep `HYPERFRAMES_SKIP_SKILLS=1
 ## Development loop
 
 1. **Scaffold:** `npx hyperframes init <project>` or capture a site. In non-TTY mode, pass `--non-interactive --example=<name>`.
-2. **Author:** write the composition using `/hyperframes-core`.
-3. **Get fast feedback while editing:** run `npx hyperframes lint` after the first HTML pass and after structural changes.
-4. **Run the final gate:** run `npx hyperframes check`; it reruns lint before opening the browser. Do not prepend a redundant standalone lint invocation. Add `--snapshots` for annotated overview frames and finding crops.
+2. **Find the move:** before authoring motion by hand, search for a matching primitive: `npx hyperframes catalog --query "<the beat, in plain English>"`. Install with `npx hyperframes add <name>` when a result fits; author by hand only when nothing fits.
+3. **Author:** write the composition using `/hyperframes-core`.
+4. **Get fast feedback while editing:** run `npx hyperframes lint` after the first HTML pass and after structural changes.
+5. **Run the final gate:** run `npx hyperframes check`; it reruns lint before opening the browser. Do not prepend a redundant standalone lint invocation. Add `--snapshots` for annotated overview frames and finding crops.
    For every non-presentation render, run `node <HYPERFRAMES_CLI_SKILL>/scripts/world-motion-audit.mjs --project .` after `check` and immediately before `render`. It requires `world-motion.json`, a script-backed world, background/environment/subject layers, and independently animated actor-to-target interactions in every declared composition. Exit code `2` is a hard BLOCK: do not render, weaken the manifest, or substitute cards/slides; repair the composition and rerun the audit.
-5. **Inspect sub-compositions:** when `index.html` mounts `data-composition-src`, capture midpoint snapshots and inspect each mounted scene.
-6. **Open the final Studio preview:** run `node <HYPERFRAMES_CLI_SKILL>/scripts/start-preview.mjs --project . --port <available-port>`, hand its timeline project URL to the user, and ask whether to revise or render. The helper keeps the server backgrounded and records `.hyperframes/preview.json` so a later edit can reconnect to the same Studio surface.
-7. **Render only after approval:** use draft quality for iteration and high quality for delivery.
-8. **Verify the output:** confirm the file exists, is non-empty, and has a plausible duration.
+6. **Inspect sub-compositions:** when `index.html` mounts `data-composition-src`, capture midpoint snapshots and inspect each mounted scene.
+7. **Open the final Studio preview:** run `node <HYPERFRAMES_CLI_SKILL>/scripts/start-preview.mjs --project . --port <available-port>`, hand its timeline project URL to the user, and ask whether to revise or render. The helper keeps the server backgrounded and records `.hyperframes/preview.json` so a later edit can reconnect to the same Studio surface.
+8. **Render only after approval:** use draft quality for iteration and high quality for delivery.
+9. **Verify the output:** confirm the file exists, is non-empty, and has a plausible duration.
 
 ```bash
 # Fast iteration check; repeat while authoring as needed.

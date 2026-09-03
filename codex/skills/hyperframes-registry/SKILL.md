@@ -85,9 +85,10 @@ See [wiring-components.md](./references/wiring-components.md) for full details.
 
 ## Discovery
 
-Use the CLI as the primary discovery surface:
+Use the CLI as the primary discovery surface. **Search by intent before browsing:**
 
 ```bash
+npx hyperframes catalog --query "reveal a headline one line at a time"
 npx hyperframes catalog
 npx hyperframes catalog --type block
 npx hyperframes catalog --type component
@@ -95,6 +96,16 @@ npx hyperframes catalog --type block --tag social
 npx hyperframes catalog --json
 npx hyperframes catalog --human-friendly
 ```
+
+Search by the effect you want, in English, rather than by the implementation mechanism. With `--json`, inspect the returned tier and result counts; do not infer that a meaningful semantic ranking happened merely because results appeared.
+
+When no result does the job, report the gap before hand-authoring the move:
+
+```bash
+npx hyperframes feedback --search-miss "<the query you ran>" --wanted "<the move you needed>" --tier <words|on-device>
+```
+
+The catalog query may provide a pre-filled report command. Reporting a miss is separate from rating and does not install or publish anything.
 
 The normal table and `--json` modes only list matches; install a selected name with `hyperframes add <name>`. `--human-friendly` opens an interactive picker and installs the selected item immediately. In CI or agent workflows, prefer `--json` followed by an explicit `add`.
 
@@ -107,6 +118,8 @@ curl -s https://raw.githubusercontent.com/heygen-com/hyperframes/main/registry/r
 Each item's `registry-item.json` contains: name, type, title, description, tags, dimensions (blocks only), duration (blocks only), and file list.
 
 See [discovery.md](./references/discovery.md) for details on filtering by type and tags.
+
+For quality audits, read [component-quality-bar.md](./references/component-quality-bar.md). When an item uses stand-in media or placeholder surfaces, apply [placeholder-material.md](./references/placeholder-material.md) so the placeholder does not invent a brand palette.
 
 ## Contributing a new block or component
 

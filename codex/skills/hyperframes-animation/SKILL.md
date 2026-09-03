@@ -1,6 +1,6 @@
 ---
 name: hyperframes-animation
-description: "All animation knowledge for HyperFrames — atomic rules, scene blueprints, transitions, image-based cartoon cutout choreography, and runtime adapters led by GSAP. Use for any motion task, including animating PNG/WebP/layered SVG/Lottie characters, vehicles, props, environments, parallax, and interactions while keeping timelines paused, seek-safe, and deterministic."
+description: "All animation knowledge for HyperFrames — atomic motion rules, scene blueprints, transitions, image-based cartoon cutout choreography, and runtime adapters led by GSAP. Use for any motion task, including animating PNG/WebP/layered SVG/Lottie characters, vehicles, props, environments, parallax, and interactions while keeping timelines paused, seek-safe, and deterministic."
 ---
 
 # HyperFrames Animation

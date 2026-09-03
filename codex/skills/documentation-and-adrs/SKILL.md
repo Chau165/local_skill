@@ -33,9 +33,19 @@ ADRs capture the reasoning behind significant technical decisions. They're the h
 - Choosing between build tools, hosting platforms, or infrastructure
 - Any decision that would be expensive to reverse
 
+### Match the existing convention first
+
+Before creating an ADR, inspect the repository for an established convention — existing ADRs, project instructions, and ADR-related configuration or tooling. An established convention overrides the defaults below. Match:
+
+- **Location and format** — for example `docs/adr/*.md`, `Documentation/Decisions/*.rst`, a MADR layout, or an `adr-tools` setup.
+- **Numbering and naming** — continue the existing sequence and filename pattern; do not restart at 001 or introduce a second scheme.
+- **Section headings** — reuse the project's heading set rather than imposing this template's.
+
+If the available evidence conflicts, surface the conflict rather than silently introducing another scheme. Only when no convention can be established do you apply the default below.
+
 ### ADR Template
 
-Store ADRs in `docs/decisions/` with sequential numbering:
+Store ADRs in `docs/decisions/` with sequential numbering (unless the project already uses another location — see above):
 
 ```markdown
 # ADR-001: Use PostgreSQL for primary database
@@ -241,7 +251,7 @@ For shipped features:
 
 Special consideration for AI agent context:
 
-- **CLAUDE.md / rules files** — Document project conventions so agents follow them
+- **AGENTS.md / instruction files** — Document project conventions so agents follow them
 - **Spec files** — Keep specs updated so agents build the right thing
 - **ADRs** — Help agents understand why past decisions were made (prevents re-deciding)
 - **Inline gotchas** — Prevent agents from falling into known traps
@@ -275,4 +285,4 @@ After documenting:
 - [ ] API functions have parameter and return type documentation
 - [ ] Known gotchas are documented inline where they matter
 - [ ] No commented-out code remains
-- [ ] Rules files (CLAUDE.md etc.) are current and accurate
+- [ ] Instruction files (AGENTS.md etc.) are current and accurate

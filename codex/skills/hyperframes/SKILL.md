@@ -119,6 +119,17 @@ For project initialization, keep `HYPERFRAMES_SKIP_SKILLS=1` in the environment.
 | Registry blocks and components                                                                                      | `/hyperframes-registry`  |
 | Figma assets, tokens, components, or storyboard frames as reconstructed motion                                      | `/figma`                 |
 
+Creator editing requests cross domain boundaries. Load every matching local domain:
+
+| Creator request | Required local skills |
+|---|---|
+| Cut, trim, splice, reorder, or use a source range | `/hyperframes-core`; it owns clip timing, `data-start`, `data-duration`, `data-media-start`, and track layout. |
+| Zoom, punch-in/punch-out, reframe, Ken Burns, or camera move | `/hyperframes-core` + `/hyperframes-keyframes`; animate the inner visual/crop wrapper, not the timed clip. |
+| Match cut, whip pan, mask, wipe, or visual handoff | `/hyperframes-animation` + `/hyperframes-keyframes`, with `/hyperframes-registry` searched before hand-authoring. |
+| Fade, crossfade, volume automation, ducking, or media preprocessing | `/hyperframes-core` for placed-track timing + `/media-use` for media operations. |
+
+Constant `data-playback-rate` is render-safe for picture and pitch-preserved sound. It does not make source speed ramps keyframeable; preprocess ramps and place the derived asset through core. Copyable cut/trim/reorder/retime/freeze recipes live in `/hyperframes-core` → `references/creator-editing-recipes.md`.
+
 Broad feedback about how photographic media looks or behaves also routes to
 `/media-use`, even when the user never says “color grading” or “effect”: fix
 dark/flat/boring footage, stylize a clip, hide a face, or improve a media

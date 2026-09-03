@@ -1,6 +1,6 @@
 ---
 name: performance-optimization
-description: Optimizes application performance. Use when performance requirements exist, when you suspect performance regressions, or when Core Web Vitals or load times need improvement. Use when profiling reveals bottlenecks that need fixing.
+description: Optimizes application performance across frontend, backend, queries, and databases. Use when performance requirements exist, when you suspect performance regressions, when Core Web Vitals or load times need improvement, when N+1 query patterns need fixing, or when profiling reveals bottlenecks.
 ---
 
 # Performance Optimization
@@ -33,7 +33,7 @@ Measure before optimizing. Performance work without measurement is guessing — 
 1. MEASURE  → Establish baseline with real data
 2. IDENTIFY → Find the actual bottleneck (not assumed)
 3. FIX      → Address the specific bottleneck
-4. VERIFY   → Measure again, confirm improvement
+4. VERIFY   → Measure again; keep or revert
 5. GUARD    → Add monitoring or tests to prevent regression
 ```
 
@@ -148,6 +148,48 @@ const tasks = await db.tasks.findMany({
   orderBy: { createdAt: 'desc' },
 });
 ```
+
+#### Queries That Ignore Their Index
+
+"Add an index" is the guess. The query plan is the measurement:
+
+```sql
+EXPLAIN ANALYZE
+SELECT id, title FROM tasks
+WHERE owner_id = 42 ORDER BY created_at DESC LIMIT 20;
+```
+
+Three things in the output decide the fix:
+
+| What you see | What it means |
+|---|---|
+| `Seq Scan` on a large table where you expected an index | No usable index for this predicate |
+| Estimated rows off from actual by an order of magnitude | Stale statistics; the planner is choosing on bad information |
+| A `Sort` node above the scan | The index covers the filter but not the `ORDER BY` |
+
+Index for the **shape of the query**, not the column in isolation. In a composite index, equality columns come first, then the range or sort column:
+
+```sql
+CREATE INDEX idx_tasks_owner_created ON tasks (owner_id, created_at DESC);
+```
+
+Re-run `EXPLAIN ANALYZE` after. An index that did not change the plan is a revert, and it still costs on every write.
+
+#### Connection Pool Exhaustion
+
+The signature is distinctive: every endpoint slows at once, the slow time is spent waiting for a connection rather than executing, and the database reports mostly idle sessions.
+
+```typescript
+// BAD: a pool per request or per module
+// GOOD: one pool per process, sized against the database ceiling
+const pool = new Pool({
+  max: 10,
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 5_000,
+});
+```
+
+**Bigger is not faster.** A pool larger than what the database can execute concurrently just relocates the queue from your app to the database. When instance count is unbounded, use a connection proxy rather than blindly raising `max`.
 
 #### Missing Image Optimization (Frontend)
 
@@ -289,6 +331,29 @@ app.use('/static', express.static('public', {
 res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
 ```
 
+Cache what is expensive to produce and read far more often than it changes. Caching an already-fast query adds a network hop, a staleness bug, and an eviction policy in exchange for nothing.
+
+**Key design decides correctness.** Every input that changes the response belongs in the key: tenant, locale, permissions, and feature flags. A key that omits the viewer can serve one user's data to another.
+
+**Guard against the stampede.** When a hot key expires, concurrent misses can overload the origin. Serve stale while a single request recomputes, or coalesce concurrent misses behind one in-flight promise.
+
+### Step 4: Verify (Keep or Revert)
+
+A fix is a hypothesis until you re-measure. Re-measure the way you measured the baseline: same command, same conditions, and the same fixed budget. Change one thing at a time and compare the delta against run-to-run variance.
+
+| Result vs. baseline | Action |
+|---|---|
+| Past the threshold, tests green | **Keep.** Record the before/after numbers. |
+| Within noise | **Revert.** |
+| Worse | **Revert.** |
+| Improved, but a test went red | **Revert.** Correctness gates the metric. |
+
+**Neutral is a revert, not a keep.** Code you keep, you maintain forever; make it pay for itself.
+
+### Step 5: Guard Against Regression
+
+Guard the metric the user actually feels, such as LCP, INP, p95 latency, or the query latency that justified the fix. Use a synthetic CI gate for reproducible regressions and field monitoring for meaningful production movement. When either guard fires, return to Step 1 and establish a fresh baseline.
+
 ## Performance Budget
 
 Set budgets and enforce them:
@@ -326,6 +391,10 @@ For detailed performance checklists, optimization commands, and anti-pattern ref
 | "This optimization is obvious" | If you didn't measure, you don't know. Profile first. |
 | "Users won't notice 100ms" | Research shows 100ms delays impact conversion rates. Users notice more than you think. |
 | "The framework handles performance" | Frameworks prevent some issues but can't fix N+1 queries or oversized bundles. |
+| "The query is slow, add an index" | Read the plan first; the index may already exist and still be unusable. |
+| "Just cache it" | Cache what is expensive and re-read far more than written; caching adds staleness risk. |
+| "Raise the pool size" | A larger pool can move the queue somewhere less visible. Find what holds connections. |
+| "It didn't help much, but it doesn't hurt" | Neutral changes are a revert; maintenance cost remains. |
 
 ## Red Flags
 

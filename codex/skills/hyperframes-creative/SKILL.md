@@ -1,6 +1,6 @@
 ---
 name: hyperframes-creative
-description: Non-animation creative direction for HyperFrames videos. Use for design specs, palettes, typography, narration, beat planning, brand/style decisions, and image-based cartoon asset direction. When a user requests illustrated characters, objects, buildings, or environments, enforce an asset-first cartoon pipeline before HyperFrames animation. For atomic motion patterns and scene blueprints, use `hyperframes-animation`.
+description: Non-animation creative direction for HyperFrames videos. Use for design specs, palettes, typography, narration, beat planning, audio-reactive visuals, brand/style decisions, and image-based cartoon asset direction. When a user requests illustrated characters, objects, buildings, or environments, enforce an asset-first cartoon pipeline before HyperFrames animation. For atomic motion patterns and scene blueprints, use `hyperframes-animation`.
 ---
 
 # HyperFrames Creative

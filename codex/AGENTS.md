@@ -474,6 +474,17 @@ Use installed Codex skills and prompt files only when they materially reduce wor
 
 ---
 
+# CodeGraph Knowledge Graph Policy
+
+When a repository has a `.codegraph/` index and the task requires code navigation, dependency tracing, caller/callee analysis, or impact assessment, use `codegraph_explore` before broad searches or multi-file reads.
+
+* Treat CodeGraph results as targeted navigation evidence, not a replacement for source verification or the project's build/test checks.
+* After edits, allow the MCP file watcher to sync; if `codegraph status` reports pending changes or the result may be stale, run `codegraph sync` before dependency or impact queries.
+* Use CodeGraph only in repositories that already contain `.codegraph/`; otherwise follow the normal targeted investigation policy.
+* Do not create or rebuild a graph index unless the user requests it or the task requires it.
+
+---
+
 # External Action Boundary
 
 Treat external side effects as approval-gated unless the user explicitly asks for them.

@@ -1,9 +1,10 @@
 ---
 name: hyperframes-keyframes
 description: >
-  Use when a HyperFrames composition needs seek-safe 2D/3D keyframes, GSAP
-  timelines, CSS keyframes, Anime.js, WAAPI, FLIP, paths, masks, SVG morph/draw,
-  text trails, 3D depth, or `hyperframes keyframes` diagnostics.
+  Use when a HyperFrames composition needs a punch-in, punch-out, zoom, reframe,
+  Ken Burns treatment, camera move, visual match/whip handoff, or other seek-safe
+  2D/3D keyframes; also for GSAP, CSS keyframes, Anime.js, WAAPI, FLIP, paths,
+  masks, SVG morph/draw, text trails, 3D depth, or `hyperframes keyframes` diagnostics.
   Don't use for broad scene strategy, brand design, media sourcing, captions, or
   general video planning.
 ---
@@ -13,6 +14,20 @@ description: >
 Keyframes are a pose contract: visible states, continuous subject identity, seek-safe runtime, verified pixels.
 
 Use `hyperframes-animation` for broad scene recipes. Use `hyperframes-cli` for full command docs. Use `references/keyframe-patterns.md` only when choosing implementation mechanisms, not visual style.
+
+## Creator editing boundary
+
+Keyframes own visual motion, not clip assembly. Source-range hard cuts, trim, splice, and reorder belong to `/hyperframes-core`: author one media element per kept range, place it with `data-start` and `data-duration`, and select its source offset with `data-media-start`.
+
+| Creator request | Truthful mechanism |
+|---|---|
+| Punch-in, punch-out, pan, reframe, or Ken Burns | Animate an inner visual/crop wrapper with scale and translation; do not change source time. |
+| Match cut or whip pan | `/hyperframes-animation` owns the visual handoff; `/hyperframes-registry` supplies primitives. There is no automatic matching-frame discovery. |
+| Crop, mask, wipe, or iris reveal | Animate `clip-path` or a mask on an inner wrapper across overlapping clips. |
+| Constant source retime | `/hyperframes-core` owns normalized `data-playback-rate`; it is constant for the whole media element. |
+| Source speed ramp or arbitrary mid-source freeze | Not supported as a keyframe envelope; preprocess a derived asset, then place it through core. |
+
+When picture and sound edits are combined, load `/hyperframes-core` for clip timing, this skill for visual motion, and `/media-use` for media sourcing or preprocessing. Use `/hyperframes-core` → `references/creator-editing-recipes.md` for copyable edit contracts.
 
 ## Procedure
 

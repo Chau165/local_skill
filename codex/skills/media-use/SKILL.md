@@ -1,6 +1,6 @@
 ---
 name: media-use
-description: Agent Media OS for HyperFrames. Resolve or generate BGM, SFX, image-based cartoon assets, layered backgrounds, icons, logos, voice, grades, and LUTs into frozen local files with ledger records; adopt generated assets, operate on media, and reuse assets across projects. Use whenever a video needs actual image files rather than primitive HTML/SVG placeholders.
+description: Agent Media OS for HyperFrames. Resolve BGM, SFX, images, icons, brand logos, voice, color grades, or LUTs into frozen local files or paste-ready blocks with ledger records; generate when the catalog misses; operate on media; and reuse assets across projects. Use whenever a video needs actual media files rather than primitive HTML/SVG placeholders.
 ---
 
 # media-use

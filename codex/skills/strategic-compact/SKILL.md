@@ -1,6 +1,6 @@
 ---
 name: strategic-compact
-description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
+description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction. Use when a session is approaching a context limit and a task phase is a natural place to compact.
 metadata:
   origin: ECC
 ---
@@ -40,24 +40,7 @@ Tool count alone is a weak proxy for window pressure: a few large file reads or 
 
 ## Hook Setup
 
-Add to your `~/.claude/settings.json`:
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit",
-        "hooks": [{ "type": "command", "command": "node ~/.claude/scripts/hooks/suggest-compact.js" }]
-      },
-      {
-        "matcher": "Write",
-        "hooks": [{ "type": "command", "command": "node ~/.claude/scripts/hooks/suggest-compact.js" }]
-      }
-    ]
-  }
-}
-```
+This local copy is used by Codex. No Claude hook installation is required. Before using the app's compaction action, write important state to project files; the task list and conversation history are not a durable substitute.
 
 ## Configuration
 
@@ -74,7 +57,7 @@ Use this table to decide when to compact:
 | Phase Transition | Compact? | Why |
 |-----------------|----------|-----|
 | Research → Planning | Yes | Research context is bulky; plan is the distilled output |
-| Planning → Implementation | Yes | Plan is in TodoWrite or a file; free up context for code |
+| Planning → Implementation | Yes | Plan is written to a file (or the task list if available); free up context for code |
 | Implementation → Testing | Maybe | Keep if tests reference recent code; compact if switching focus |
 | Debugging → Next feature | Yes | Debug traces pollute context for unrelated work |
 | Mid-implementation | No | Losing variable names, file paths, and partial state is costly |
@@ -86,15 +69,15 @@ Understanding what persists helps you compact with confidence:
 
 | Persists | Lost |
 |----------|------|
-| CLAUDE.md instructions | Intermediate reasoning and analysis |
-| TodoWrite task list | File contents you previously read |
-| Memory files (`~/.claude/memory/`) | Multi-step conversation context |
+| `AGENTS.md` and project instructions | Intermediate reasoning and analysis |
+| Task list, if available | File contents you previously read |
+| Codex memory files (if configured) | Multi-step conversation context |
 | Git state (commits, branches) | Tool call history and counts |
 | Files on disk | Nuanced user preferences stated verbally |
 
 ## Best Practices
 
-1. **Compact after planning** — Once plan is finalized in TodoWrite, compact to start fresh
+1. **Compact after planning** — Once the plan is finalized and written to a file, compact to start fresh
 2. **Compact after debugging** — Clear error-resolution context before continuing
 3. **Don't compact mid-implementation** — Preserve context for related changes
 4. **Read the suggestion** — The hook tells you *when*, you decide *if*
@@ -114,15 +97,15 @@ Instead of loading full skill content at session start, use a trigger table that
 
 ### Context Composition Awareness
 Monitor what's consuming your context window:
-- **CLAUDE.md files** — Always loaded, keep lean
+- **AGENTS.md/project instruction files** — Always loaded, keep lean
 - **Loaded skills** — Each skill adds 1-5K tokens
 - **Conversation history** — Grows with each exchange
 - **Tool results** — File reads, search results add bulk
 
 ### Duplicate Instruction Detection
 Common sources of duplicate context:
-- Same rules in both `~/.claude/rules/` and project `.claude/rules/`
-- Skills that repeat CLAUDE.md instructions
+- Same rules in user-level and project instruction files
+- Skills that repeat `AGENTS.md` instructions
 - Multiple skills covering overlapping domains
 
 ### Context Optimization Tools

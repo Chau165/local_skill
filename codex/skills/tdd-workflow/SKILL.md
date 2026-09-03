@@ -1,7 +1,6 @@
 ---
 name: tdd-workflow
 description: Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.
-argument-hint: <path/to/*.plan.md>
 metadata:
   origin: ECC
 ---
@@ -85,6 +84,26 @@ ALWAYS write tests first, then implement code to make tests pass.
 
 ## TDD Workflow Steps
 
+### Step 0: Detect the Test Runner
+
+Do not assume `npm test`. Resolve the project's package manager and test runner from its repository files before starting:
+
+1. Inspect `package.json` (`packageManager` and `scripts.test`) and the lockfile.
+2. Distinguish the package manager from the test runner. A project can use Bun to install dependencies and still run Jest or Vitest.
+3. Inspect test imports/configuration: `jest` or `vitest` means run the package script; `bun:test` or an explicit `bun test` script means use Bun's native runner.
+
+Use placeholders in the steps below after resolving them:
+
+| Runner | `<test>` | `<test-watch>` | `<coverage>` | `<lint>` |
+|---|---|---|---|---|
+| npm | `npm test` | `npm test -- --watch` | `npm run test:coverage` | `npm run lint` |
+| pnpm | `pnpm test` | `pnpm test --watch` | `pnpm test:coverage` | `pnpm lint` |
+| yarn | `yarn test` | `yarn test --watch` | `yarn test:coverage` | `yarn lint` |
+| Bun script | `bun run test` | `bun run test --watch` | `bun run test:coverage` | `bun run lint` |
+| Bun native | `bun test` | `bun test --watch` | `bun test --coverage` | `bun run lint` |
+
+`bun test` runs Bun's native runner; `bun run test` runs the `package.json` script. Confirm which one the project expects before the RED gate.
+
 ### Step 1: Write User Journeys
 
 If a `*.plan.md` file was provided, extract the user journeys and acceptance criteria from that plan first. Only write new journeys for gaps the plan does not cover.
@@ -122,7 +141,7 @@ describe('Semantic Search', () => {
 
 ### Step 3: Run Tests (They Should Fail)
 ```bash
-npm test
+<test>
 # Tests should fail - we haven't implemented yet
 ```
 
@@ -163,7 +182,7 @@ If the repository is under Git, stage the minimal fix now but defer the checkpoi
 
 ### Step 5: Run Tests Again
 ```bash
-npm test
+<test>
 # Tests should now pass
 ```
 
@@ -191,7 +210,7 @@ Recommended commit message format:
 
 ### Step 7: Verify Coverage
 ```bash
-npm run test:coverage
+<coverage>
 # Verify 80%+ coverage achieved
 ```
 
@@ -206,10 +225,10 @@ Store the evidence report in the project's standard documentation directory, for
 ```text
 docs/testing/<plan-or-task-name>.tdd.md
 .github/tdd/<plan-or-task-name>.tdd.md
-.claude/tdd/<plan-or-task-name>.tdd.md
+.codex/tdd/<plan-or-task-name>.tdd.md
 ```
 
-If the repository already uses Claude-specific local artifacts, the `.claude/tdd/` location is also acceptable. Include:
+If the repository already uses a different local artifact convention, follow that convention. Include:
 
 1. **Source plan** - link the `*.plan.md` file if one was used, or state that journeys were derived during this TDD run.
 2. **User journeys** - list the journeys from the plan or the ones written in Step 1.
@@ -223,8 +242,8 @@ If the repository already uses Claude-specific local artifacts, the `.claude/tdd
 ```markdown
 | # | What is guaranteed | Test file or command | Test type | Result | Evidence |
 |---|--------------------|----------------------|-----------|--------|----------|
-| 1 | Empty search returns an empty result list without throwing | `src/search.test.ts:returns empty list for empty query` | unit | PASS | `npm test -- search.test.ts` |
-| 2 | API rejects invalid limit values with HTTP 400 | `src/api/markets/route.test.ts:validates query parameters` | integration | PASS | `npm test -- route.test.ts` |
+| 1 | Empty search returns an empty result list without throwing | `src/search.test.ts:returns empty list for empty query` | unit | PASS | `<test> -- search.test.ts` |
+| 2 | API rejects invalid limit values with HTTP 400 | `src/api/markets/route.test.ts:validates query parameters` | integration | PASS | `<test> -- route.test.ts` |
 ```
 
 5. **Coverage and known gaps** - include the coverage command/result when available and explain any intentional gaps, skipped tests, or untested follow-ups.
@@ -260,6 +279,22 @@ describe('Button Component', () => {
   })
 })
 ```
+
+### Bun Native Test Pattern (`bun:test`)
+
+When the project uses Bun's built-in runner, import from `bun:test` and run with `bun test`, not `bun run test`. The API is Jest-like, so `describe`, `it`, and `expect` usually carry over.
+
+```typescript
+import { describe, it, expect } from 'bun:test'
+
+describe('searchMarkets', () => {
+  it('returns an empty list for an empty query', async () => {
+    expect(await searchMarkets('')).toEqual([])
+  })
+})
+```
+
+Mock with Bun's `mock()`/`mock.module()` APIs instead of `jest.mock()`. Configure Bun coverage in `bunfig.toml` when the project uses it.
 
 ### API Integration Test Pattern
 ```typescript
@@ -409,7 +444,7 @@ jest.mock('@/lib/openai', () => ({
 
 ### Run Coverage Report
 ```bash
-npm run test:coverage
+<coverage>
 ```
 
 ### Coverage Thresholds
@@ -480,21 +515,21 @@ test('updates user', () => {
 
 ### Watch Mode During Development
 ```bash
-npm test -- --watch
+<test-watch>
 # Tests run automatically on file changes
 ```
 
 ### Pre-Commit Hook
 ```bash
 # Runs before every commit
-npm test && npm run lint
+<test> && <lint>
 ```
 
 ### CI/CD Integration
 ```yaml
 # GitHub Actions
 - name: Run Tests
-  run: npm test -- --coverage
+  run: <coverage>
 - name: Upload Coverage
   uses: codecov/codecov-action@v3
 ```

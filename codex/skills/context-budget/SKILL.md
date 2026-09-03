@@ -1,13 +1,13 @@
 ---
 name: context-budget
-description: Audits Claude Code context window consumption across agents, skills, MCP servers, and rules. Identifies bloat, redundant components, and produces prioritized token-savings recommendations.
+description: Audits the Codex context window consumption across agents, skills, MCP servers, and rules. Identifies bloat, redundant components, and produces prioritized token-savings recommendations. Use when the context window is filling up too fast and its consumers need to be identified.
 metadata:
   origin: ECC
 ---
 
 # Context Budget
 
-Analyze token overhead across every loaded component in a Claude Code session and surface actionable optimizations to reclaim context space.
+Analyze token overhead across every loaded component in a Codex session and surface actionable optimizations to reclaim context space.
 
 ## When to Use
 
@@ -43,8 +43,8 @@ Scan all component directories and estimate token consumption:
 - Estimate schema overhead at ~500 tokens per tool
 - Flag: servers with >20 tools, servers that wrap simple CLI commands (`gh`, `git`, `npm`, `supabase`, `vercel`)
 
-**CLAUDE.md** (project + user-level)
-- Count tokens per file in the CLAUDE.md chain
+**Instruction files** (project + user-level)
+- Count tokens per file in the `AGENTS.md`/instruction chain
 - Flag: combined total >300 lines
 
 ### Phase 2: Classify
@@ -53,19 +53,19 @@ Sort every component into a bucket:
 
 | Bucket | Criteria | Action |
 |--------|----------|--------|
-| **Always needed** | Referenced in CLAUDE.md, backs an active command, or matches current project type | Keep |
-| **Sometimes needed** | Domain-specific (e.g. language patterns), not referenced in CLAUDE.md | Consider on-demand activation |
+| **Always needed** | Referenced in project instructions, backs an active command, or matches current project type | Keep |
+| **Sometimes needed** | Domain-specific (e.g. language patterns), not referenced in project instructions | Consider on-demand activation |
 | **Rarely needed** | No command reference, overlapping content, or no obvious project match | Remove or lazy-load |
 
 ### Phase 3: Detect Issues
 
 Identify the following problem patterns:
 
-- **Bloated agent descriptions** — description >30 words in frontmatter loads into every Task tool invocation
+- **Bloated agent descriptions** — description >30 words in frontmatter loads into every delegated task
 - **Heavy agents** — files >200 lines inflate Task tool context on every spawn
-- **Redundant components** — skills that duplicate agent logic, rules that duplicate CLAUDE.md
+- **Redundant components** — skills that duplicate agent logic, rules that duplicate project instruction files
 - **MCP over-subscription** — >10 servers, or servers wrapping CLI tools available for free
-- **CLAUDE.md bloat** — verbose explanations, outdated sections, instructions that should be rules
+- **Instruction-file bloat** — verbose explanations, outdated sections, instructions that should be rules
 
 ### Phase 4: Report
 
@@ -76,7 +76,7 @@ Context Budget Report
 ═══════════════════════════════════════
 
 Total estimated overhead: ~XX,XXX tokens
-Context model: Claude Sonnet (200K window)
+Context model: current Codex model (window size detected from the session)
 Effective available context: ~XXX,XXX tokens (XX%)
 
 Component Breakdown:
@@ -87,7 +87,7 @@ Component Breakdown:
 │ Skills          │ N      │ ~X,XXX    │
 │ Rules           │ N      │ ~X,XXX    │
 │ MCP tools       │ N      │ ~XX,XXX   │
-│ CLAUDE.md       │ N      │ ~X,XXX    │
+│ Instructions    │ N      │ ~X,XXX    │
 └─────────────────┴────────┴───────────┘
 
 WARNING: Issues Found (N):
@@ -108,7 +108,7 @@ In verbose mode, additionally output per-file token counts, line-by-line breakdo
 **Basic audit**
 ```
 User: /context-budget
-Skill: Scans setup → 16 agents (12,400 tokens), 28 skills (6,200), 87 MCP tools (43,500), 2 CLAUDE.md (1,200)
+Skill: Scans setup → 16 agents (12,400 tokens), 28 skills (6,200), 87 MCP tools (43,500), 2 instruction files (1,200)
        Flags: 3 heavy agents, 14 MCP servers (3 CLI-replaceable)
        Top saving: remove 3 MCP servers → -27,500 tokens (47% overhead reduction)
 ```
@@ -131,6 +131,6 @@ Skill: Current overhead 33% → adding 5 servers (~50 tools) would add ~25,000 t
 
 - **Token estimation**: use `words × 1.3` for prose, `chars / 4` for code-heavy files
 - **MCP is the biggest lever**: each tool schema costs ~500 tokens; a 30-tool server costs more than all your skills combined
-- **Agent descriptions are loaded always**: even if the agent is never invoked, its description field is present in every Task tool context
+- **Agent descriptions are loaded always**: even if the agent is never invoked, its description field may be present in delegated-task context
 - **Verbose mode for debugging**: use when you need to pinpoint the exact files driving overhead, not for regular audits
 - **Audit after changes**: run after adding any agent, skill, or MCP server to catch creep early
