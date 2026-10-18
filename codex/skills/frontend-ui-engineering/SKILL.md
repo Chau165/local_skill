@@ -115,6 +115,12 @@ Global store (Zustand, Redux)    → Complex client state shared app-wide
 
 ## Design System Adherence
 
+### Reference-led UI quality
+
+When a distinct visual direction is needed, gather evidence from references supplied by the user or product team, or from a trusted catalogue if one is available. Study two or three relevant screens and record their hierarchy, density, navigation, controls, responsive behavior, and interaction states. Turn that into a short design contract before implementation: screen purpose, primary action, required states, responsive rules, and patterns to avoid.
+
+Use references as evidence, not templates. Rebuild useful structure with the product's own components, tokens, content, and visual language; do not copy another product's branding, proprietary text, imagery, or exact layout. If references are unavailable, state assumptions and follow the existing design system.
+
 ### Avoid the AI Aesthetic
 
 AI-generated UI has recognizable patterns. Avoid all of them:
@@ -323,6 +329,7 @@ After building UI:
 - [ ] All interactive elements are keyboard accessible (Tab through the page)
 - [ ] Screen reader can convey the page's content and structure
 - [ ] Responsive: works at 320px, 768px, 1024px, 1440px
-- [ ] Loading, error, and empty states all handled
+- [ ] Loading, empty, error, success, and permission states handled when applicable
 - [ ] Follows the project's design system (spacing, colors, typography)
+- [ ] The rendered result passes a final UI-specific finish-gate review
 - [ ] No accessibility warnings in dev tools or axe-core

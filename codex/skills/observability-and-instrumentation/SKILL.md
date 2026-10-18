@@ -88,6 +88,8 @@ app.use((req, res, next) => {
 });
 ```
 
+When multiple entry points write to the same log (for example, a scheduler, replay endpoint, and CLI), stamp a bounded `entryPoint` field where each run starts, next to the correlation ID, and propagate both across queue and HTTP boundaries. A correlation ID identifies a run; it does not identify which code path started it. Do not infer entry point from downstream symptoms or use an unbounded label for it.
+
 **Never log secrets, tokens, passwords, or full PII.** This is a hard rule from the `security-review` skill — telemetry pipelines are a classic data-leak path. Allowlist fields; don't log whole request bodies.
 
 ### 4. Metrics
@@ -153,6 +155,17 @@ Rules for every alert you create:
 2. **It links to a runbook** — even three lines: what it means, first query to run, escalation path.
 3. **It has a threshold and duration** justified by the SLO or by historical data, not by a guess.
 4. Use two severities only: **page** (user-facing, act now) and **ticket** (degradation, act this week). A third tier becomes noise that trains people to ignore everything.
+
+#### Writing Runbooks
+
+Every alert must link to a runbook. Follow the repository's documentation convention; if none exists, use `docs/runbooks/` and name the file after the alert. At minimum document what the alert means, the first safe query or check to run, and the escalation path. Expand only when needed to choose the next action, and update the runbook when an incident reveals stale or incorrect steps.
+
+```markdown
+# Runbook: High Error Rate on /api/tasks
+**Means:** The DB connection pool may be exhausted, or a recent deploy may be failing.
+**First check:** Inspect connection-pool usage and recent error logs using the project's approved tooling.
+**Escalate to:** The documented engineering on-call path.
+```
 
 ### 7. Verify the telemetry itself
 

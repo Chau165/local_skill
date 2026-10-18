@@ -12,6 +12,10 @@ A comprehensive verification system for Codex sessions.
 
 ## When to Use
 
+Use the applicable phases below, following the user's request and repository instructions. Do not run unrelated or broad checks, or imply a skipped phase passed. A verification workflow does not by itself authorize a test run, security scan, deployment, commit, or other change outside the requested scope.
+
+The command examples use POSIX shell. In PowerShell, use the repository's equivalent commands and preserve `$LASTEXITCODE` when filtering native-command output.
+
 Invoke this skill:
 - After completing a feature or significant code change
 - Before creating a PR
@@ -22,6 +26,7 @@ Invoke this skill:
 
 ### Phase 1: Build Verification
 ```bash
+set -o pipefail
 # Check if project builds
 npm run build 2>&1 | tail -20
 # OR
@@ -32,26 +37,29 @@ If build fails, STOP and fix before continuing.
 
 ### Phase 2: Type Check
 ```bash
+set -o pipefail
 # TypeScript projects
-npx --no-install tsc --noEmit 2>&1 | head -30
+npx --no-install tsc --noEmit 2>&1 | sed -n '1,30p'
 
 # Python projects
-pyright . 2>&1 | head -30
+pyright . 2>&1 | sed -n '1,30p'
 ```
 
 Report all type errors. Fix critical ones before continuing.
 
 ### Phase 3: Lint Check
 ```bash
+set -o pipefail
 # JavaScript/TypeScript
-npm run lint 2>&1 | head -30
+npm run lint 2>&1 | sed -n '1,30p'
 
 # Python
-ruff check . 2>&1 | head -30
+ruff check . 2>&1 | sed -n '1,30p'
 ```
 
 ### Phase 4: Test Suite
 ```bash
+set -o pipefail
 # Run tests with coverage
 npm run test -- --coverage 2>&1 | tail -50
 
@@ -67,12 +75,13 @@ Report:
 
 ### Phase 5: Security Scan
 ```bash
-# Check for secrets
-grep -rn "sk-" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
-grep -rn "api_key" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
+set -o pipefail
+# Search prints file paths only, never matching secret text; grep exit 1 means no match.
+grep -rln "sk-" --include="*.ts" --include="*.js" . | sed -n '1,10p'
+grep -rln "api_key" --include="*.ts" --include="*.js" . | sed -n '1,10p'
 
 # Check for console.log
-grep -rn "console.log" --include="*.ts" --include="*.tsx" src/ 2>/dev/null | head -10
+grep -rln "console.log" --include="*.ts" --include="*.tsx" src/ | sed -n '1,10p'
 ```
 
 ### Phase 6: Diff Review

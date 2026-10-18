@@ -1,6 +1,6 @@
 ---
 name: documentation-and-adrs
-description: Records decisions and documentation. Use when making architectural decisions, changing public APIs, shipping features, or when you need to record context that future engineers and agents will need to understand the codebase.
+description: Records architectural decisions and project documentation. Use when documenting design choices, changing public APIs, shipping features, or preserving context for future engineers and agents.
 ---
 
 # Documentation and ADRs
@@ -35,10 +35,10 @@ ADRs capture the reasoning behind significant technical decisions. They're the h
 
 ### Match the existing convention first
 
-Before creating an ADR, inspect the repository for an established convention — existing ADRs, project instructions, and ADR-related configuration or tooling. An established convention overrides the defaults below. Match:
+Before creating an ADR, inspect the available repository context for an established convention — existing ADRs, project instructions, and ADR-related configuration or tooling (for example, an `.adr-dir` file). An established convention overrides the defaults below. Match:
 
-- **Location and format** — for example `docs/adr/*.md`, `Documentation/Decisions/*.rst`, a MADR layout, or an `adr-tools` setup.
-- **Numbering and naming** — continue the existing sequence and filename pattern; do not restart at 001 or introduce a second scheme.
+- **Location and format** — for example `docs/adr/*.md`, `Documentation/Decisions/*.rst`, a MADR layout, or an `adr-tools` setup. Match the directory, file extension, and markup (Markdown vs reStructuredText).
+- **Numbering and naming** — continue the existing sequence and filename pattern (such as `ADR-004-Title.rst` or `0004-title.md`); do not restart at 001 or introduce a second scheme.
 - **Section headings** — reuse the project's heading set rather than imposing this template's.
 
 If the available evidence conflicts, surface the conflict rather than silently introducing another scheme. Only when no convention can be established do you apply the default below.
@@ -51,7 +51,7 @@ Store ADRs in `docs/decisions/` with sequential numbering (unless the project al
 # ADR-001: Use PostgreSQL for primary database
 
 ## Status
-Accepted | Superseded by ADR-XXX | Deprecated
+Proposed | Accepted | Superseded by ADR-XXX | Deprecated
 
 ## Date
 2025-01-15
@@ -255,6 +255,14 @@ Special consideration for AI agent context:
 - **Spec files** — Keep specs updated so agents build the right thing
 - **ADRs** — Help agents understand why past decisions were made (prevents re-deciding)
 - **Inline gotchas** — Prevent agents from falling into known traps
+
+## Prose Review
+
+After checking technical content, review the prose for its intended readers. Improve clarity without changing the decision or its limits:
+
+1. Preserve names, numbers and units, commands, paths, links, conditions, trade-offs, and uncertainty; verify them against available source context and flag unsupported details.
+2. Remove stock introductions, promotional adjectives, and repeated summaries. Do not replace unsupported claims with invented examples or stronger guarantees; retain necessary technical repetition and project terminology.
+3. Compare the edit with the original and its sources. Restore lost caveats, verify examples still work as documented, and surface unresolved factual questions rather than smoothing them over.
 
 ## Common Rationalizations
 

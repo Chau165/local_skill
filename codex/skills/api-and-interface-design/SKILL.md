@@ -174,7 +174,7 @@ try {
   await db.insert({ key, state: 'in_progress', requestHash });
 } catch (e) {
   if (isUniqueViolation(e)) return replayOrReject(key);
-  throw;
+  throw e;
 }
 const result = await chargeCard(amount);
 await db.update({ key, state: 'succeeded', response: result });
@@ -202,7 +202,7 @@ Never let the second caller through because the first "seems stuck". A stalled a
 
 **Every call has three outcomes, not two: success, failure, and _unknown_.** A timeout tells you nothing about whether the effect applied. Record the intent before calling out, so a crash between the call and the response leaves evidence something must resolve later rather than a silently retried charge.
 
-**Set retention from the longest retry chain**, not from disk cost. Keys must outlive every path that can re-deliver the same intent, including a dead-letter queue replayed a week later and any provider dispute window.
+**Set retention from the longest retry chain**, not from storage cost. Keys must outlive every path that can re-deliver the same intent, including dead-letter queues replayed days later and any provider dispute window. A 24-hour key TTL behind a 7-day dead-letter queue can permit a duplicate effect.
 
 ### 5. Predictable Naming
 

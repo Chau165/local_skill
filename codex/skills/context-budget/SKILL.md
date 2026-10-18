@@ -1,136 +1,35 @@
 ---
 name: context-budget
-description: Audits the Codex context window consumption across agents, skills, MCP servers, and rules. Identifies bloat, redundant components, and produces prioritized token-savings recommendations. Use when the context window is filling up too fast and its consumers need to be identified.
+description: Checks live Codex context usage through the native meter, or audits installed context-related components when explicitly requested. Use for questions about remaining context or a bounded static context audit.
 metadata:
   origin: ECC
 ---
 
 # Context Budget
 
-Analyze token overhead across every loaded component in a Codex session and surface actionable optimizations to reclaim context space.
+Use Codex's native meter for live session usage. Keep static installation audits separate and opt-in.
 
-## When to Use
+## Live Context (default)
 
-- Session performance feels sluggish or output quality is degrading
-- You've recently added many skills, agents, or MCP servers
-- You want to know how much context headroom you actually have
-- Planning to add more components and need to know if there's room
-- Running `/context-budget` command (this skill backs it)
+Treat requests about current context usage, remaining capacity, headroom, or the live context breakdown as live-context requests unless the user explicitly asks to inspect installed files.
 
-## How It Works
+- Do not call tools, scan files, run shell commands, or estimate live usage.
+- Tell the user to run `/status` in Codex to view current context usage.
+- For a persistent footer meter, suggest `/statusline` and enabling **Context stats** and **Token counters**.
+- A skill cannot invoke a slash command or read the live meter on the user's behalf. If slash commands are unavailable in the active surface, say the live value cannot be verified here.
 
-### Phase 1: Inventory
+See the [Codex slash-command reference](https://developers.openai.com/codex/cli/slash-commands).
 
-Scan all component directories and estimate token consumption:
+## Explicit Static Audit
 
-**Agents** (`agents/*.md`)
-- Count lines and tokens per file (words × 1.3)
-- Extract `description` frontmatter length
-- Flag: files >200 lines (heavy), description >30 words (bloated frontmatter)
+Inspect installed components only when the user explicitly asks to audit installed skills, instructions, agents, or context overhead. If the root or harness scope is unclear, ask before reading files. Keep the audit bounded and read-only:
 
-**Skills** (`skills/*/SKILL.md`)
-- Count tokens per SKILL.md
-- Flag: files >400 lines
-- Check for duplicate copies in `.agents/skills/` — skip identical copies to avoid double-counting
+1. Inspect only the named installation root and relevant configuration files.
+2. Do not recursively scan the home directory, caches, transcripts, debug logs, workspace roots, or unrelated worktrees.
+3. Cap detailed entries at 50 per component class; summarize the rest.
+4. Separate eagerly discovered metadata (such as skill names and descriptions) from on-demand skill bodies. Report file size/line counts separately from any estimate of eager context.
+5. Report token counts only when a tokenizer appropriate to the active model is available and its use is verified. Otherwise provide counts or sizes as proxies and label them clearly; never present a heuristic as live or exact token usage.
 
-**Rules** (`rules/**/*.md`)
-- Count tokens per file
-- Flag: files >100 lines
-- Detect content overlap between rule files in the same language module
+## Audit Output
 
-**MCP Servers** (`.mcp.json` or active MCP config)
-- Count configured servers and total tool count
-- Estimate schema overhead at ~500 tokens per tool
-- Flag: servers with >20 tools, servers that wrap simple CLI commands (`gh`, `git`, `npm`, `supabase`, `vercel`)
-
-**Instruction files** (project + user-level)
-- Count tokens per file in the `AGENTS.md`/instruction chain
-- Flag: combined total >300 lines
-
-### Phase 2: Classify
-
-Sort every component into a bucket:
-
-| Bucket | Criteria | Action |
-|--------|----------|--------|
-| **Always needed** | Referenced in project instructions, backs an active command, or matches current project type | Keep |
-| **Sometimes needed** | Domain-specific (e.g. language patterns), not referenced in project instructions | Consider on-demand activation |
-| **Rarely needed** | No command reference, overlapping content, or no obvious project match | Remove or lazy-load |
-
-### Phase 3: Detect Issues
-
-Identify the following problem patterns:
-
-- **Bloated agent descriptions** — description >30 words in frontmatter loads into every delegated task
-- **Heavy agents** — files >200 lines inflate Task tool context on every spawn
-- **Redundant components** — skills that duplicate agent logic, rules that duplicate project instruction files
-- **MCP over-subscription** — >10 servers, or servers wrapping CLI tools available for free
-- **Instruction-file bloat** — verbose explanations, outdated sections, instructions that should be rules
-
-### Phase 4: Report
-
-Produce the context budget report:
-
-```
-Context Budget Report
-═══════════════════════════════════════
-
-Total estimated overhead: ~XX,XXX tokens
-Context model: current Codex model (window size detected from the session)
-Effective available context: ~XXX,XXX tokens (XX%)
-
-Component Breakdown:
-┌─────────────────┬────────┬───────────┐
-│ Component       │ Count  │ Tokens    │
-├─────────────────┼────────┼───────────┤
-│ Agents          │ N      │ ~X,XXX    │
-│ Skills          │ N      │ ~X,XXX    │
-│ Rules           │ N      │ ~X,XXX    │
-│ MCP tools       │ N      │ ~XX,XXX   │
-│ Instructions    │ N      │ ~X,XXX    │
-└─────────────────┴────────┴───────────┘
-
-WARNING: Issues Found (N):
-[ranked by token savings]
-
-Top 3 Optimizations:
-1. [action] → save ~X,XXX tokens
-2. [action] → save ~X,XXX tokens
-3. [action] → save ~X,XXX tokens
-
-Potential savings: ~XX,XXX tokens (XX% of current overhead)
-```
-
-In verbose mode, additionally output per-file token counts, line-by-line breakdown of the heaviest files, specific redundant lines between overlapping components, and MCP tool list with per-tool schema size estimates.
-
-## Examples
-
-**Basic audit**
-```
-User: /context-budget
-Skill: Scans setup → 16 agents (12,400 tokens), 28 skills (6,200), 87 MCP tools (43,500), 2 instruction files (1,200)
-       Flags: 3 heavy agents, 14 MCP servers (3 CLI-replaceable)
-       Top saving: remove 3 MCP servers → -27,500 tokens (47% overhead reduction)
-```
-
-**Verbose mode**
-```
-User: /context-budget --verbose
-Skill: Full report + per-file breakdown showing planner.md (213 lines, 1,840 tokens),
-       MCP tool list with per-tool sizes, duplicated rule lines side by side
-```
-
-**Pre-expansion check**
-```
-User: I want to add 5 more MCP servers, do I have room?
-Skill: Current overhead 33% → adding 5 servers (~50 tools) would add ~25,000 tokens → pushes to 45% overhead
-       Recommendation: remove 2 CLI-replaceable servers first to stay under 40%
-```
-
-## Best Practices
-
-- **Token estimation**: use `words × 1.3` for prose, `chars / 4` for code-heavy files
-- **MCP is the biggest lever**: each tool schema costs ~500 tokens; a 30-tool server costs more than all your skills combined
-- **Agent descriptions are loaded always**: even if the agent is never invoked, its description field may be present in delegated-task context
-- **Verbose mode for debugging**: use when you need to pinpoint the exact files driving overhead, not for regular audits
-- **Audit after changes**: run after adding any agent, skill, or MCP server to catch creep early
+Return a compact report with the harness, exact paths and scope inspected, component counts, the measurement method, key findings, and up to three prioritized optimizations. State omitted paths, uncertainty, and any unavailable measurements. An installation estimate is not the provider-reported live context or proof of realized savings. Direct the user to `/status` for current session usage.
