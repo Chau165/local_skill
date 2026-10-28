@@ -19,6 +19,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $CodexHome 'AGENTS.md'))) {
     Write-Host "Existing AGENTS.md preserved; review the snapshot at $backupRoot\\codex\\AGENTS.md before merging."
 }
 Copy-Merge (Join-Path $backupRoot 'codex\\skills') (Join-Path $CodexHome 'skills')
+Copy-Merge (Join-Path $backupRoot 'agents/skills') (Join-Path $env:USERPROFILE '.agents/skills')
 Copy-Merge (Join-Path $backupRoot 'codex\\agents') (Join-Path $CodexHome 'agents')
 Copy-Merge (Join-Path $backupRoot 'codex\\prompts') (Join-Path $CodexHome 'prompts')
 Copy-Merge (Join-Path $backupRoot 'plugins\\ecc') $EccRoot

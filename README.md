@@ -1,15 +1,16 @@
 # Codex Configuration Backup
 
-This is the `Chau165/local_skill` backup repository for the local Codex `AGENTS.md`, skills, prompts, agents, and ECC plugin workflows.
+This is the `Chau165/local_skill` backup repository for local Codex instructions, skills, prompts, agents, and ECC plugin workflows.
 
-The snapshot was refreshed from the local installation on 2026-09-03.
+The snapshot was refreshed from the local installation on 2026-10-28.
 
-This repository stores the user-maintained Codex configuration surface from `C:\Users\Surface\.codex`.
+This repository stores user-maintained Codex files from `C:\Users\Surface\.codex` and global Agent Skills from `C:\Users\Surface\.agents\skills`.
 
 ## Included
 
 - `codex/AGENTS.md`: global Codex instructions.
 - `codex/skills/`: complete snapshot of `C:\Users\Surface\.codex\skills`, including bundled `.system` skills and each skill's supporting references, scripts, tests, assets, and configuration files.
+- `agents/skills/`: snapshot of `C:\Users\Surface\.agents\skills`, including complete supporting files and divergent same-named skills.
 - `codex/agents/`: local agent profiles.
 - `codex/prompts/`: local prompt workflows.
 - `plugins/ecc/`: ECC Codex plugin manifest and source skills.
@@ -17,8 +18,10 @@ This repository stores the user-maintained Codex configuration surface from `C:\
 
 ## Excluded
 
-Runtime state, credentials, caches, logs, databases, session data, attachments, generated artifacts, Python bytecode (`__pycache__`/`.pyc`), and bundled plugin caches are intentionally excluded.
+Runtime state, credentials, caches, logs, databases, session data, attachments, generated artifacts, Python bytecode (`__pycache__`/`.pyc`), and bundled plugin caches are intentionally excluded. `config.toml` and MCP registrations are not included because they contain machine-specific runtime paths and should be configured per machine.
 
 ## Restore
+
+Copy `agents/skills/` to `%USERPROFILE%/.agents/skills` after reviewing existing files. Merge instead of replacing; this preserves copies that differ from same-named skills under `.codex`.
 
 Copy the contents of `codex/` into `%USERPROFILE%\\.codex`, and copy `plugins/ecc/` plus `metadata/marketplace.json` to the corresponding local locations after reviewing the current files. Merge instead of replacing existing configuration. The bundled `.system` snapshot is included for archival completeness; Codex may provide its own matching system skills.
