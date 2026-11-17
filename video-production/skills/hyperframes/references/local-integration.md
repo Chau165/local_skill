@@ -1,0 +1,11 @@
+# Local integration policy (audited video setup)
+
+This installation is shared across projects. Apply each project's AGENTS.md and the user's brief. The active task owns the framework, output and style: HyperFrames is an available compositor, not a universal default. Existing Remotion source remains Remotion unless the user requests a port.
+
+- User footage, locked script, transcript, approved facts and constrained references are authoritative. Do not rewrite, summarize, reorder, replace a voice or invent claims to fit a creative recipe. Storyline alternatives apply only to original creative work where the user permits them.
+- For supplied speech, preserve original audio and chronology. Keep complete captions visible through graphics, PiP and overlays; use the language specified by the user. New voiceover, voice cloning and private media uploads require explicit authorization.
+- Check time-sensitive claims from reliable sources with retrieval/as-of timestamps. Label hypothetical data. Record discrepancies and obtain approval before changing original substantive content. Mark unavailable verification NOT VERIFIED.
+- No mandatory cartoon, character, 3D world, palette, slide prohibition or actor-target gate. Select those techniques only when the brief calls for them. The legacy world-motion preset is opt-in; see the installed video-production-workflow skill.
+- Reuse useful craft: deterministic finite seek-safe motion, meaningful continuity, reading holds, independent layers when interactions need them, source/asset ledgers, appropriate chart baselines, caption contrast and safe areas, representative frames plus transition inspection and real render verification.
+- Prefer local processing for private footage/audio. An account or installed provider does not authorize uploads, cloning or paid generations. Do not pause a local-only task for optional provider sign-in. Do not run usage/account/telemetry calls merely because a skill was loaded; DO_NOT_TRACK=1 is used by the video workspace wrapper.
+- CLI is pinned to hyperframes@0.9.59 in scripts/plugin-cli.mjs. Keep HYPERFRAMES_SKIP_SKILLS=1 for scaffolding and test runs. Before updates, back up complete affected skill directories, compare upstream and preserve/reapply the local patch with an exact diff. Do not run an automatic updater over this custom installation.

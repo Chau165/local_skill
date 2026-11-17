@@ -1,0 +1,4 @@
+interface:
+  display_name: "SVG / Paper.js Support Graphics"
+  short_description: "Create support SVG for cartoon animation"
+  default_prompt: "Use $svg-paperjs to create rails, pipelines, routes, gauges, masks, particles, or other support graphics without replacing primary illustrated assets."

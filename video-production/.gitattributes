@@ -1,0 +1,2 @@
+# Preserve exact snapshot bytes across Windows/macOS/Linux checkouts.
+* -text

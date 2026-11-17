@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lottie Motion Assets"
+  short_description: "Use reusable Lottie motion inside world scenes"
+  default_prompt: "Use $lottie-motion to add a deterministic Lottie asset to this HyperFrames world-motion video."
